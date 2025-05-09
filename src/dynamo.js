@@ -4,13 +4,18 @@ import { DynamoDBDocument, DynamoDBDocumentClient, PutCommand, ScanCommand } fro
 const client = new DynamoDBClient({
     region: import.meta.env.VITE_AWS_REGION,
     credentials: {
-    accessKey: import.meta.env.VITE_ACCESS_KEY,
-    accessSecret: import.meta.env.VITE_ACCESS_SECRET,
+    accessKeyId: import.meta.env.VITE_ACCESS_KEY,
+    secretAccessKey: import.meta.env.VITE_ACCESS_SECRET,
     }
 });
 
 const dClient = DynamoDBDocumentClient.from(client)
 
-export async function scanToDo(item) {
+export async function createToDo(item) {
     await dClient.send(new PutCommand({ TableName: "ToDo", Item: item }));
+}
+
+export async function scanToDo() {
+   const data =  await dClient.send(new ScanCommand({TableName: "ToDo"}))
+return data.Items || [];
 }

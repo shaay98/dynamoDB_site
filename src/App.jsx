@@ -1,5 +1,7 @@
-import './App.css'
+import './App.css';
+import { useEffect, useState} from 'react';
 import "./dynamo.js"
+import { createToDo, scanToDo } from './dynamo.js';
 
 function App() {
   const [todos, setTodos] = useState([]);
@@ -7,33 +9,39 @@ function App() {
 
 
   useEffect(() => {
-  scanTodos().then(setTodos);
+  scanToDo().then(setTodos);
   }, []);
 
   const handleAdd = async () => {
     if (!text.trim()) return;
     const newItem = { id: Date.now().toString(), text, completed: false };
-    await createTodo(newItem);
+    await createToDo(newItem);
     setTodos(prev => [...prev, newItem]);
     setText('');
   };
 
   return (
-    <div style={{ padding: 20 }}>
-      <h1>Todo App</h1>
+    <div>
+      <h1>ToDo App</h1>
+      <label>
       <input
         value={text}
         onChange={e => setText(e.target.value)}
-        placeholder="New todo"
-        style={{ marginRight: 8 }}
+        placeholder="New ToDo"
       />
+      </label>
       <button onClick={handleAdd}>Add</button>
+      <ul>
+        {
+          todos.map(todo =>(
+           <li key={todo.id}>
+            {todo.text}
 
-      <ul style={{ marginTop: 16 }}>
-        {todos.map(t => (
-          <li key={t.id}>{t.text}</li>
-        ))}
+         </li>
+          ))
+        }
       </ul>
+      
     </div>
   );
 }
