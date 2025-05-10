@@ -1,7 +1,8 @@
 import './App.css';
 import { useEffect, useState} from 'react';
 import "./dynamo.js"
-import { createToDo, scanToDo } from './dynamo.js';
+import { createToDo, deleteTodo, scanToDo, toggleDone } from './dynamo.js';
+import ToDo from './ToDo.jsx';
 
 function App() {
   const [todos, setTodos] = useState([]);
@@ -20,29 +21,41 @@ function App() {
     setText('');
   };
 
+  async function handleToggle(ToDo) {
+    const flipped = !ToDo.completed;
+
+    toggleDone (ToDo.id, flipped);
+    setTodos((prev) => 
+    prev.map((item) => 
+    item.id === ToDo.id ? { ...item, completed: flipped } : item,
+  ),
+  );
+}
+async function handleDelete(id) {
+  await deleteTodo(id);
+  setTodos((prev) => prev.filter((item) => item.id != id));
+}
+
   return (
-    <div>
+    <>
       <h1>ToDo App</h1>
       <label>
       <input
         value={text}
+        type='text'
+        name='ToDo'
+        id='ToDo'
         onChange={e => setText(e.target.value)}
         placeholder="New ToDo"
       />
       </label>
       <button onClick={handleAdd}>Add</button>
-      <ul>
-        {
-          todos.map(todo =>(
-           <li key={todo.id}>
-            {todo.text}
-
-         </li>
-          ))
-        }
-      </ul>
-      
-    </div>
+      <ToDo      
+      ToDos={todos}
+      onHandleDelete={handleDelete}
+      onHandleUpdate={handleToggle}
+      />
+    </>
   );
 }
 export default App
